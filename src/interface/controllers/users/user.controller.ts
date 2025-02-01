@@ -7,14 +7,14 @@ import { Register } from "src/use-cases/users/register/register.use-case";
 @Controller('users')
 export class UserController {
     constructor(
-        private readonly getBiodataUseCase: GetBiodata,
+        // private readonly getBiodataUseCase: GetBiodata,
         private readonly register: Register
     ) {}
 
-    @Get('findMe')
-    findMyInformation(@FindEmail() email: string) {
-        return this.getBiodataUseCase.execute(email);
-    }
+    // @Get('findMe')
+    // findMyInformation(@FindEmail() email: string) {
+    //     return this.getBiodataUseCase.execute(email);
+    // }
 
     @Post('register')
     registerAccount(@Body() registerDto: RegisterDto) {
