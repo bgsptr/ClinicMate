@@ -1,4 +1,5 @@
-export interface IMapper<Input, Output> {
-    mapFromDto?(input: Input): Output;
-    mapToEntity?(output: Output): Input;
+export interface IMapper<Input, Output, Response> {
+    mapFromDto?(input: Input, ...args: any): Output;
+    mapFromEntity?(output: Output, ...args: any): Input;
+    mapToResponseJson?(...args: any): Response;
 }

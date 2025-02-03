@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("MYSQL_URL")
+}
+
+model Patient {
+  id_patient   String    @id @default(uuid())
+  name         String
+  birth_date   DateTime
+  gender       Gender
+  address      String
+  phone_number String
+  user         User      @relation(fields: [email], references: [email])
+  email        String    @unique
+  rawat_jalan  RawatJalan[]
+}
+
+model Doctor {
+  id_doctor    String     @id @default(uuid())
+  name         String
+  address      String
+  phone_number String
+  user         User       @relation(fields: [email], references: [email])
+  email        String     @unique
+  schedules    Schedule[]
+  rawatjalan   RawatJalan[]
+}
+
+model Schedule {
+  id_schedule String    @id @default(uuid())
+  doctor      Doctor    @relation(fields: [id_doctor], references: [id_doctor])
+  id_doctor   String
+  day         String
+  start_time  DateTime
+  end_time    DateTime
+  slot        Int
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+model RawatJalan {
+  id_rawat_jalan String          @id @default(uuid())
+  patient        Patient         @relation(fields: [id_patient], references: [id_patient])
+  id_patient     String
+  doctor         Doctor          @relation(fields: [id_doctor], references: [id_doctor])
+  id_doctor      String
+  visit_date     DateTime
+  status_rawat_jalan RawatJalanStatus
+  medical_record MedicalRecord[]
+  queue          RawatJalanQueue?
+}
+
+model MedicalRecord {
+  id_medical_record String       @id @default(uuid())
+  rawatjalan        RawatJalan   @relation(fields: [id_rawat_jalan], references: [id_rawat_jalan])
+  id_rawat_jalan    String       
+  // id_patient        Patient
+  diagnose          String
+  medical_action    String
+  createdAt         DateTime     @default(now())
+}
+
+enum RawatJalanStatus {
+  FINISHED
+  UNFINISHED
+}
+
+model RawatJalanQueue {
+  id_queue         Int           @id @default(autoincrement())
+  rawatjalan       RawatJalan    @relation(fields: [id_rawat_jalan], references: [id_rawat_jalan])
+  id_rawat_jalan   String        @unique
+  queue_no         Int
+  queue_status     QueueStatus
+  rawat_jalan_date DateTime
+}
+
+enum QueueStatus {
+  WAITING
+  PROCESSED
+  FINISHED
+}
+
+model User {
+  email    String @unique @id
+  password String
+  role     RoleUser?
+  doctor   Doctor?
+  patient  Patient?
+}
+
+enum RoleUser {
+  ADMIN
+  DOCTOR
+  PATIENT
+}

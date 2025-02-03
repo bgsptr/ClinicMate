@@ -3,12 +3,13 @@ import { Register } from "./register.use-case";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { Hasher } from "src/provider/bcrypt.provider";
 import { RegisterDto } from "src/core/domain/interfaces/dtos/users/register.dto";
-import { RegisterAccountMapper } from "src/core/domain/mappers/users/register-account.mapper";
+import { AuthAccountMapper } from "src/core/domain/mappers/users/auth-account.mapper";
+import { PrismaClient } from "@prisma/client";
 
 describe('RegisterUsecase', () => {
     let userRepository: UserRepository;
     let hasher: IHasher;
-    let registerAccountMapper: RegisterAccountMapper;
+    let authAccountMapper: AuthAccountMapper;
     let register: Register;
     let registerDto: RegisterDto;
 
@@ -16,10 +17,10 @@ describe('RegisterUsecase', () => {
     const password = '123456';
     
     beforeEach(async () => {
-        userRepository = new UserRepository();
+        userRepository = new UserRepository(new PrismaClient());
         hasher = new Hasher();
-        registerAccountMapper = new RegisterAccountMapper();
-        register = new Register(userRepository, hasher, registerAccountMapper);
+        authAccountMapper = new AuthAccountMapper();
+        register = new Register(userRepository, hasher, authAccountMapper);
         registerDto = new RegisterDto(email, password);
     });
 
