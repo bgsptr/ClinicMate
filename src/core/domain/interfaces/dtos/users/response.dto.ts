@@ -1,7 +1,9 @@
 export class ResponseDto {
     constructor(
         public error: boolean,
+        public status_codes: number,
         public message: string,
-        public status?: number
+        public result: any,
+        // public status?: number
     ) {}
 }

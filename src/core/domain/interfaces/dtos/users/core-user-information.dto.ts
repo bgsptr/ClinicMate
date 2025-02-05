@@ -1,16 +1,22 @@
-export enum Role {
-    admin = "ADMIN",
-    patient = "PATIENT",
-    doctor = "DOCTOR"
+export const Role: {
+    ADMIN: 'ADMIN'
+    PATIENT: 'PATIENT'
+    DOCTOR: 'DOCTOR'
+} = {
+    ADMIN: 'ADMIN',
+    PATIENT: 'PATIENT',
+    DOCTOR: 'DOCTOR'
 }
+
+export type Role = typeof Role[keyof typeof Role]
 
 export const Gender: {
     MALE: 'MALE'
     FEMALE: 'FEMALE'
-  } = {
+} = {
     MALE: 'MALE',
     FEMALE: 'FEMALE',
-  }
+}
 
 export type Gender = typeof Gender[keyof typeof Gender]
 

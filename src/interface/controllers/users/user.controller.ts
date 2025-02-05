@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { Roles } from "src/core/domain/decorators/roles.decorator";
 import { CoreUserInformationDto } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
@@ -8,7 +8,8 @@ import { RolesGuard } from "src/core/domain/guards/role.guard";
 import { GetBiodata } from "src/use-cases/users/get-biodata/get-biodata.use-case";
 import { Login } from "src/use-cases/users/login/login.use-case";
 import { Register } from "src/use-cases/users/register/register.use-case";
-import { UpdateAccount } from "src/use-cases/users/update-account/update-account.use-case";
+import { UpdateRoleOrDataUserUsecase } from "src/use-cases/users/change-data/change-data.use-case";
+// import { UpdateAccount } from "src/use-cases/users/update-account/update-account.use-case";
 
 @Controller('users')
 export class UserController {
@@ -16,11 +17,11 @@ export class UserController {
         private readonly getBiodataUseCase: GetBiodata,
         private readonly register: Register,
         private readonly login: Login,
-        private readonly updateAccount: UpdateAccount,
+        private readonly updateRoleOrDataUserUsecase: UpdateRoleOrDataUserUsecase,
     ) {}
 
     // @Roles(['patient, admin, doctor'])
-    @Get('findMe')
+    @Get('me')
     findMyInformation(@FindEmail() email: string) {
         return this.getBiodataUseCase.execute(email);
     }
@@ -31,8 +32,26 @@ export class UserController {
     }
 
     @Post('login')
-    loginAccount(@Body() loginDto: LoginDto) {
-        return this.login.execute(loginDto);
+    async loginAccount(@Body() loginDto: LoginDto) {
+        try {
+            return await this.login.execute(loginDto);
+        } catch (error) {
+            const data = JSON.parse(error?.message);
+            console.log(data)
+            throw new HttpException({
+                error: true,
+                message: data?.message
+            }, data?.statusCode, {
+                cause: error
+            }
+         )
+        }
+
+    }
+
+    @Put(':email/role')
+    async changeRoleOrPrivacyInfo(@Param() email: string) {
+        await this.updateRoleOrDataUserUsecase.execute();
     }
 
     // @Put('/')

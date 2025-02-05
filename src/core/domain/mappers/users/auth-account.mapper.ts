@@ -13,10 +13,12 @@ export class AuthAccountMapper implements IMapper<RegisterDto | LoginDto, UserEn
         )
     }
 
-    mapToResponseJson(status: boolean, message: string, output?: UserEntity): ResponseDto {
+    mapToResponseJson(status: boolean, status_codes: number, message: string, result?: any, output?: UserEntity): ResponseDto {
         return new ResponseDto(
             status,
-            message
+            status_codes,
+            message,
+            result
         )
     }
 }

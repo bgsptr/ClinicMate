@@ -24,4 +24,10 @@ export class UserRepository extends BaseRepository implements IUserRepository {
             }
         })
     }
+
+    async updateRoleByEmail(email: string): Promise<void> {
+        await this.prisma.user.findUniqueOrThrow({
+            where: { email }
+        })
+    }
 }
