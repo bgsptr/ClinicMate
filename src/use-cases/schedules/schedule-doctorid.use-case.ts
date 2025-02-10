@@ -21,7 +21,7 @@ export class ScheduleDoctorIdUseCase {
                 // throw error
                 return
             case "DOCTOR":
-                const { id_doctor: doctorIdFromDatabase } = await this.doctorRepository.findDoctorById(email);
+                const { id_doctor: doctorIdFromDatabase } = await this.doctorRepository.findDoctorIdByEmail(email);
 
                 return await this.scheduleRepository.findByIdDoctor(doctorIdFromDatabase);
             default:

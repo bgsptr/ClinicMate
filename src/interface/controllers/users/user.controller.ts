@@ -17,7 +17,7 @@ export class UserController {
         private readonly getBiodataUseCase: GetBiodata,
         private readonly register: Register,
         private readonly login: Login,
-        private readonly updateRoleOrDataUserUsecase: UpdateRoleOrDataUserUsecase,
+        // private readonly updateRoleOrDataUserUsecase: UpdateRoleOrDataUserUsecase,
     ) {}
 
     // @Roles(['patient, admin, doctor'])
@@ -49,10 +49,10 @@ export class UserController {
 
     }
 
-    @Put(':email/role')
-    async changeRoleOrPrivacyInfo(@Param() email: string) {
-        await this.updateRoleOrDataUserUsecase.execute();
-    }
+    // @Put(':email/role')
+    // async changeRoleOrPrivacyInfo(@Param() email: string) {
+    //     // await this.updateRoleOrDataUserUsecase.execute();
+    // }
 
     // @Put('/')
     // updateProfile(@Body() userDto: CoreUserInformationDto) {

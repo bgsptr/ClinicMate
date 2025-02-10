@@ -1,3 +1,4 @@
+import { Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
 import { UserEntity } from "../../core/domain/entities/user.entity";
 import { IUserRepository } from "../../core/domain/interfaces/repositories/user.repository.interface";
 import { BaseRepository } from "./base.repository";
@@ -25,9 +26,18 @@ export class UserRepository extends BaseRepository implements IUserRepository {
         })
     }
 
-    async updateRoleByEmail(email: string): Promise<void> {
+    async findRoleByEmail(email: string): Promise<void> {
         await this.prisma.user.findUniqueOrThrow({
-            where: { email }
+            where: { email },
+        })
+    }
+
+    async updateRoleByEmail(email: string, role: Role): Promise<void> {
+        await this.prisma.user.update({
+            where: { email },
+            data: {
+                role
+            }
         })
     }
 }

@@ -7,6 +7,6 @@ export class UpdateRoleOrDataUserUsecase {
     ) {}
 
     async execute(email: string, selectedRole: string) {
-        await this.userRepository.updateRoleByEmail(email, Role)
+        await this.userRepository.findRoleByEmail(email)
     }
 }
