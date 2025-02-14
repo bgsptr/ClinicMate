@@ -1,0 +1,54 @@
+name: Pull image from Docker Hub and deploy it to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create SSH Key
+        run: |
+          echo "${{ secrets.AWS_SSHKEY }}" > id_rsa
+          chmod 600 id_rsa 
+
+      - name: Create deployment script
+        run: |
+          cat << 'EOF' > ec2.sh
+          #!/bin/bash
+
+          # Update system and install Docker
+          sudo apt update
+          sudo apt install -y docker.io
+
+          # Ensure Docker service is running
+          sudo systemctl enable docker
+          sudo systemctl start docker
+          sudo usermod -aG docker ubuntu
+
+          # Pull latest image from Docker Hub
+          sudo docker pull ${{ vars.DOCKER_IMAGE_URL }}
+
+          # Stop and remove existing container
+          sudo docker stop be-clinicmate || true
+          sudo docker rm be-clinicmate || true
+
+          # Run new container
+          sudo docker run -d --name be-clinicmate -p ${{ secrets.EC2_BE_PORT }}:${{ secrets.EC2_BE_PORT }} ${{ vars.DOCKER_IMAGE_URL }}
+          EOF
+
+          chmod +x ec2.sh
+
+      - name: Copy deployment script to AWS EC2
+        run: |
+          scp -i id_rsa -o StrictHostKeyChecking=no ec2.sh ubuntu@${{ secrets.EC2_BE_IP }}:~
+
+      - name: Execute deployment script on AWS EC2
+        run: |
+          ssh -i id_rsa -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_BE_IP }} 'bash ~/ec2.sh'
