@@ -18,11 +18,10 @@ jobs:
           echo "${{ secrets.AWS_SSHKEY }}" > id_rsa
           chmod 600 id_rsa 
 
-      - name: Create deployment script
+      - name: SSH into EC2 and deploy
         run: |
-          cat << 'EOF' > ec2.sh
-          #!/bin/bash
-
+          ssh -i id_rsa -o StrictHostKeyChecking=no ubuntu@13.213.74.144 << 'EOF'
+          
           # Update system and install Docker
           sudo apt update
           sudo apt install -y docker.io
@@ -32,6 +31,10 @@ jobs:
           sudo systemctl start docker
           sudo usermod -aG docker ubuntu
 
+          # Create and execute deployment script
+          cat << 'SCRIPT' > ~/ec2.sh
+          #!/bin/bash
+          
           # Pull latest image from Docker Hub
           sudo docker pull putrawan/be-clinicmate:latest
 
@@ -41,14 +44,8 @@ jobs:
 
           # Run new container
           sudo docker run -d --name be-clinicmate -p 3000:3000 putrawan/be-clinicmate:latest
+          SCRIPT
+
+          chmod +x ~/ec2.sh
+          bash ~/ec2.sh
           EOF
-
-          chmod +x ec2.sh
-
-      - name: Copy deployment script to AWS EC2
-        run: |
-          scp -i id_rsa -o StrictHostKeyChecking=no ec2.sh ubuntu@13.213.74.144:~
-
-      - name: Execute deployment script on AWS EC2
-        run: |
-          ssh -i id_rsa -o StrictHostKeyChecking=no ubuntu@13.213.74.144 'bash ~/ec2.sh'
