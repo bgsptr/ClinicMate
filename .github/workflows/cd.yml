@@ -22,33 +22,24 @@ jobs:
         run: |
           cat << 'EOF' > ec2.sh
           #!/bin/bash
-
-          # Update system and install Docker
           sudo apt update
           sudo apt install -y docker.io
-
-          # Ensure Docker service is running
           sudo systemctl enable docker
           sudo systemctl start docker
           sudo usermod -aG docker ubuntu
 
-          # Pull latest image from Docker Hub
-          sudo docker pull ${{ vars.DOCKER_IMAGE_URL }}
-
-          # Stop and remove existing container
+          sudo docker pull $DOCKER_IMAGE_URL
           sudo docker stop be-clinicmate || true
           sudo docker rm be-clinicmate || true
-
-          # Run new container
-          sudo docker run -d --name be-clinicmate -p ${{ secrets.EC2_BE_PORT }}:${{ secrets.EC2_BE_PORT }} ${{ vars.DOCKER_IMAGE_URL }}
+          sudo docker run -d --name be-clinicmate -p $EC2_BE_PORT:$EC2_BE_PORT $DOCKER_IMAGE_URL
           EOF
 
           chmod +x ec2.sh
 
       - name: Copy deployment script to AWS EC2
         run: |
-          scp -i id_rsa ec2.sh ubuntu@${{ EC2_BE_IP }}:~
+          scp -o StrictHostKeyChecking=no -i id_rsa ec2.sh ubuntu@${{ secrets.EC2_BE_IP }}:~
 
       - name: Execute deployment script on AWS EC2
         run: |
-          ssh -i id_rsa ubuntu@${{ EC2_BE_IP }} './ec2.sh'
+          ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${{ secrets.EC2_BE_IP }} "DOCKER_IMAGE_URL=${{ vars.DOCKER_IMAGE_URL }} EC2_BE_PORT=${{ secrets.EC2_BE_PORT }} bash -s" < ec2.sh
