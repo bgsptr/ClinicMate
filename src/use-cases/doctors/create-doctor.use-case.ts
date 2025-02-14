@@ -7,9 +7,9 @@ import { v4 as uuidv4 } from "uuid";
 
 export class CreateDoctorUsecase {
     constructor(
-        public doctorRepository: DoctorRepository,
-        public userRepository: UserRepository,
-        public createDoctorMapper : CreateDoctorMapper
+        private doctorRepository: DoctorRepository,
+        private userRepository: UserRepository,
+        private createDoctorMapper : CreateDoctorMapper
     ) {}
 
     async execute(doctorDto: AssignDoctorDto) {
@@ -45,10 +45,5 @@ export class CreateDoctorUsecase {
             }
             throw new Error(JSON.stringify(data));
         }
- 
-
-
-        
-
     }
 }
