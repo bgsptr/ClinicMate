@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create SSH Key
         run: |
@@ -33,22 +33,22 @@ jobs:
           sudo usermod -aG docker ubuntu
 
           # Pull latest image from Docker Hub
-          sudo docker pull putrawan/be-clinicmate:latest
+          sudo docker pull ${{ vars.DOCKER_IMAGE_URL }}
 
           # Stop and remove existing container
           sudo docker stop be-clinicmate || true
           sudo docker rm be-clinicmate || true
 
           # Run new container
-          sudo docker run -d --name be-clinicmate -p 3000:3000 putrawan/be-clinicmate:latest
+          sudo docker run -d --name be-clinicmate -p ${{ secrets.EC2_BE_PORT }}:${{ secrets.EC2_BE_PORT }} ${{ vars.DOCKER_IMAGE_URL }}
           EOF
 
           chmod +x ec2.sh
 
       - name: Copy deployment script to AWS EC2
         run: |
-          scp -i id_rsa -o StrictHostKeyChecking=no ec2.sh ubuntu@13.213.74.144:~
+          scp -i id_rsa ec2.sh ubuntu@${{ EC2_BE_IP }}:~
 
       - name: Execute deployment script on AWS EC2
         run: |
-          ssh -i id_rsa -o StrictHostKeyChecking=no ubuntu@13.213.74.144 'bash ~/ec2.sh'
+          ssh -i id_rsa ubuntu@${{ EC2_BE_IP }} './ec2.sh'
