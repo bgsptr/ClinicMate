@@ -2,28 +2,32 @@ name: node.js ci
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: action/checkout@v4
-      - name: 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - name: install depedencies
+
+      - name: Install dependencies
         run: npm install
-      
-      - name: login to docker hub
+
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: deploy to docker repo
+
+      - name: Deploy to Docker repo
         uses: docker/build-push-action@v6
         with:
           context: .
