@@ -105,4 +105,18 @@ export class DoctorRepository extends BaseRepository implements IDoctorRepositor
             where: { id_doctor }
         })
     }
+
+    async selectedDoctorOnOutpatient(doctorIds: string[]) {
+        return await this.prisma.doctor.findMany({
+            where: {
+                id_doctor: {
+                    in: doctorIds
+                }
+            },
+            select: {
+                id_doctor: true,
+                name: true
+            }
+        })
+    }
 }

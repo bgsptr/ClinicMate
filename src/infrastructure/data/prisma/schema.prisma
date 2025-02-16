@@ -17,6 +17,7 @@ model Patient {
   user         User      @relation(fields: [email], references: [email])
   email        String    @unique
   rawat_jalan  RawatJalan[]
+  url_profile  String?
 }
 
 model Doctor {
@@ -28,6 +29,7 @@ model Doctor {
   email        String     @unique
   schedules    Schedule[]
   rawatjalan   RawatJalan[]
+  url_profile  String?
 }
 
 model Schedule {

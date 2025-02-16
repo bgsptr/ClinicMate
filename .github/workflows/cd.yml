@@ -38,8 +38,8 @@ jobs:
 
       - name: Copy deployment script to AWS EC2
         run: |
-          scp -o StrictHostKeyChecking=no -i id_rsa ec2.sh ubuntu@${{ secrets.EC2_BE_IP }}:~
+          scp -i id_rsa ec2.sh ubuntu@${{ secrets.EC2_BE_IP }}:~
 
       - name: Execute deployment script on AWS EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i id_rsa ubuntu@${{ secrets.EC2_BE_IP }} "DOCKER_IMAGE_URL=${{ vars.DOCKER_IMAGE_URL }} EC2_BE_PORT=${{ secrets.EC2_BE_PORT }} bash -s" < ec2.sh
+          ssh -i id_rsa ubuntu@${{ secrets.EC2_BE_IP }} "DOCKER_IMAGE_URL=${{ vars.DOCKER_IMAGE_URL }} EC2_BE_PORT=${{ secrets.EC2_BE_PORT }} bash -s" < ec2.sh

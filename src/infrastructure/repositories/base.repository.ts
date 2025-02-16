@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 export class BaseRepository {
-    constructor(public prisma: PrismaClient) {
+    constructor(protected prisma: PrismaClient) {
         this.prisma = new PrismaClient();
     }
 }

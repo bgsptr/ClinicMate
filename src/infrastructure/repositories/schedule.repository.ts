@@ -16,6 +16,19 @@ export class ScheduleRepository extends BaseRepository implements Repository<Sch
         });
     }
 
+    async createAndFetch(data: ScheduleEntity): Promise<ScheduleEntity> {
+        return await this.prisma.schedule.create({
+            data: {
+                id_schedule: data.id_schedule,
+                id_doctor: data.id_doctor,
+                day: data.day,
+                start_time: data.start_time,
+                end_time: data.end_time,
+                slot: data.slot
+            }
+        });
+    }
+
     async updateById(id: number | string, data: ScheduleEntity): Promise<void> {
         await this.prisma.schedule.update({
             data: {
@@ -53,5 +66,16 @@ export class ScheduleRepository extends BaseRepository implements Repository<Sch
 
     async findAllSchedule(): Promise<ScheduleEntity[]> {
         return await this.prisma.schedule.findMany();
+    }
+
+    async checkScheduleExist(day: string, id_doctor: string): Promise<ScheduleEntity | null> {
+        return await this.prisma.schedule.findFirst({
+            where: {
+                AND: {
+                    day: day,
+                    id_doctor: id_doctor
+                }
+            }
+        })
     }
 }

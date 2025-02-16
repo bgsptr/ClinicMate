@@ -14,8 +14,11 @@ import { ScheduleDoctorIdUseCase } from "src/use-cases/schedules/schedule-doctor
 @Module({
     controllers: [ScheduleControler],
     providers: [
-        ScheduleControler,
+        ScheduleRepository,
         CreateScheduleMapper,
+        FetchScheduleMapper,
+        CreateScheduleDto,
+        DoctorRepository,
         {
             provide: CreateScheduleUsecase,
             useFactory: (

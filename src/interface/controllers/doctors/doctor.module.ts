@@ -6,6 +6,7 @@ import { DoctorRepository } from "src/infrastructure/repositories/doctor.reposit
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { FindDoctorUsecase } from "src/use-cases/doctors/find-doctor.use-case";
 import { UpdateDoctorUsecase } from "src/use-cases/doctors/update-doctor.use-case";
+import { ShowAllDoctorUsecase } from "src/use-cases/doctors/show-all-doctor.use-case";
 
 @Module({
     controllers: [DoctorController],
@@ -38,6 +39,14 @@ import { UpdateDoctorUsecase } from "src/use-cases/doctors/update-doctor.use-cas
             ) => new UpdateDoctorUsecase(doctorRepository, createDoctorMapper),
             inject: [DoctorRepository, CreateDoctorMapper]
         },
+        {
+            provide: ShowAllDoctorUsecase,
+            useFactory: (
+                doctorRepository: DoctorRepository,
+                createDoctorMapper: CreateDoctorMapper
+            ) => new ShowAllDoctorUsecase(doctorRepository, createDoctorMapper),
+            inject: [DoctorRepository, CreateDoctorMapper]
+        }
     ]
 })
 

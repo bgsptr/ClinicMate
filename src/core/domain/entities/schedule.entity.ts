@@ -5,6 +5,7 @@ export class ScheduleEntity {
         public day: string,
         public start_time: Date,
         public end_time: Date,
-        public slot: number
+        public slot: number,
+        // public url_profile?: string | null
     ) {}
 }

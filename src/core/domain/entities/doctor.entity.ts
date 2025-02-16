@@ -4,6 +4,7 @@ export class DoctorEntity {
         public name: string,
         public address: string,
         public phone_number: string,
-        public email: string
+        public email: string,
+        public url_profile?: string | null
     ) {}
 }

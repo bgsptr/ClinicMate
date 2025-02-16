@@ -19,13 +19,18 @@ export class CreateScheduleMapper implements IMapper<CreateScheduleDto, Schedule
         return new CreateScheduleDto(
             output.id_doctor,
             output.day,
-            args[0],
-            args[1],
+            args[0] || output.start_time,
+            args[1] || output.end_time,
             output.slot
         )
     }
 
-    // mapToResponseJson(...args: any): ResponseDto {
-        
-    // }
+    mapToResponseJson(...args: any): ResponseDto {
+        return new ResponseDto(
+            false,
+            201,
+            args[0],
+            args[1]
+        )
+    }
 }

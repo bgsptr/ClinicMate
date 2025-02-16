@@ -3,6 +3,7 @@ import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { AssignDoctorDto } from "src/core/domain/interfaces/dtos/admins/assign-doctor.dto";
 import { CreateDoctorUsecase } from "src/use-cases/doctors/create-doctor.use-case";
 import { FindDoctorUsecase } from "src/use-cases/doctors/find-doctor.use-case";
+import { ShowAllDoctorUsecase } from "src/use-cases/doctors/show-all-doctor.use-case";
 import { UpdateDoctorUsecase } from "src/use-cases/doctors/update-doctor.use-case";
 
 @Controller('doctors')
@@ -11,7 +12,13 @@ export class DoctorController {
         public createDoctorUsecase : CreateDoctorUsecase,
         public findDoctorUsecase : FindDoctorUsecase,
         public updateDoctorUsecase : UpdateDoctorUsecase,
+        public showAllDoctorUsecase: ShowAllDoctorUsecase
     ) {}
+
+    @Get()
+    async fetchAllDoctors() {
+        return await this.showAllDoctorUsecase.execute();
+    }
 
     @Get(":doctor_id")
     async getDoctorId(@Param() params: { doctor_id: string }) {

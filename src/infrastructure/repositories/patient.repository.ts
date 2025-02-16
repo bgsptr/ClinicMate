@@ -37,4 +37,28 @@ export class PatientRepository extends BaseRepository implements IPatientReposit
             where: { email }
         })
     }
+
+    async showAll(index: number): Promise<PatientEntity[]> {
+        return await this.prisma.patient.findMany({
+            take: 10,
+            skip: index * 10,
+            orderBy: {
+                id_patient: 'asc'
+            }
+        });
+    }
+
+    async selectedPatientOnOutpatient(patientIds: string[]) {
+        return await this.prisma.patient.findMany({
+            where: {
+                id_patient: {
+                    in: patientIds
+                }
+            },
+            select: {
+                id_patient: true,
+                name: true
+            }
+        })
+    }
 }

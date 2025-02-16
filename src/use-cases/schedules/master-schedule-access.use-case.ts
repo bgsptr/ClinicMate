@@ -15,6 +15,7 @@ export class SchedulesDto {
 }
 
 export interface SchedulesObject {
+    doctor_id: string;
     doctor_name: string;
     schedules: SchedulesDto[];
 }
@@ -27,69 +28,44 @@ export class MasterScheduleAccessUsecase {
         private fetchScheduleMapper: FetchScheduleMapper
     ) {}
 
-    async recursive(schedules: ScheduleEntity[], doctors: Doctor[], data: Map<string, SchedulesObject>, doctorIdx: number) {
-        if (doctorIdx >= doctors.length) return;
+    recursive(schedules: ScheduleEntity[], doctors: Doctor[], data: Map<string, SchedulesObject>, doctorIdx: number) {
+        if (doctorIdx >= doctors.length) return data;
 
         const { id_doctor: doctorId, name: doctorName } = doctors[doctorIdx];
-        data.set(doctorId, {
-            "doctor_name": doctorName,
-            "schedules": []
-        });
+
+        if (!data.has(doctorId)) {
+            data.set(doctorId, {
+                "doctor_id": doctorId,
+                "doctor_name": doctorName,
+                "schedules": []
+            });
+        }
 
         schedules.map((schedule) => {
             if (schedule.id_doctor === doctorId) {
-                data.get(doctorId)?.schedules?.push(schedule);
+                const scheduleDto = this.fetchScheduleMapper.mapFromEntity(schedule);
+                data.get(doctorId)?.schedules?.push(scheduleDto);
             }
         });
-
-        // const doctorSchedules: ScheduleEntity[] = schedules.filter(schedule => schedule.id_doctor === doctorId);
-
-        // const doctorData = data.get(doctorId);
-        // if (doctorData) doctorData.schedules?.push(doctorSchedules);    
-
+        
         return this.recursive(schedules, doctors, data, doctorIdx + 1);
 
     }
 
     async execute() {
-        const data: Map<string, SchedulesObject> = new Map();
+        const data = new Map<string, SchedulesObject>();
         const doctors = await this.doctorRepository.findAllDoctor();
         const schedules = await this.scheduleRepository.findAllSchedule();
-        
-        const doctorIdx = 0;
-        const result = this.recursive(schedules, doctors, data, doctorIdx);
+
+        this.recursive(schedules, doctors, data, 0);
+
+        const resultArray = Array.from(data.values());
+
+        console.log(resultArray)
 
         return this.fetchScheduleMapper.mapToResponseJson(
             "schedule fetched successfully",
-            result
+            resultArray
         )
     }
-    // {
-        
-            
-    //              "id_doctor1" => {
-    //                 "doctor_name": "waawa",
-    //                 "schedules": [
-    //                     {
-    //                         "id1": 
-    //                     },
-    //                     {
-    //                         "id2":
-    //                     }
-    //                 ]
-    //             },
-    //             "id_doctor2" => {
-    //                 "doctor_name": "waawa",
-    //                 "schedules": [
-    //                     {
-    //                         "id1": 
-    //                     },
-    //                     {
-    //                         "id2":
-    //                     }
-    //                 ]
-    //             }
-            
-    //     }
-    
 }
