@@ -7,6 +7,6 @@ export class OutpatientEntity {
         public id_doctor: string,
         public visit_date: Date,
         public status_rawat_jalan: OutpatientStatus,
-        public status_verifikasi?: VerificationStatus
+        public verifikasi_status: VerificationStatus | null
     ) {}
 }

@@ -5,17 +5,23 @@ import { OutpatientEntity } from "src/core/domain/entities/outpatient.entity";
 import { OutpatientStatus, VerificationStatus } from "src/core/domain/interfaces/types/enum.type";
 
 export class OutpatientRepository extends BaseRepository implements IOutpatientRepository {
-    async create(data: OutpatientEntity): Promise<void> {
-        await this.prisma.rawatJalan.create({
+    async create(data: OutpatientEntity): Promise<Partial<OutpatientEntity>> {
+        const { id_rawat_jalan, status_rawat_jalan, verifikasi_status } = await this.prisma.rawatJalan.create({
             data: {
                 id_rawat_jalan: data.id_rawat_jalan,
                 id_patient: data.id_patient,
                 id_doctor: data.id_doctor,
                 visit_date: data.visit_date,
                 status_rawat_jalan: OutpatientStatus.UNFINISHED,
-                // status_verifikasi: VerificationStatus.PENDING
+                verifikasi_status: VerificationStatus.PENDING
             }
         })
+
+        return {
+            id_rawat_jalan,
+            status_rawat_jalan,
+            verifikasi_status
+        }
     }
 
     async findAll(): Promise<OutpatientEntity[] | null> {
@@ -45,16 +51,22 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
         });
     }
 
-    // async updateVerificationStatus(outpatientId: string, allowed: boolean): Promise<void> {
-    //     await this.prisma.rawatJalan.update({
-    //         where: {
-    //             id_rawat_jalan: outpatientId
-    //         },
-    //         data: {
-    //             status_verifikasi: allowed ? VerificationStatus.ACCEPTED : VerificationStatus.REJECTED
-    //         }
-    //     });
-    // }
+    async updateVerificationStatus(outpatientId: string, status: VerificationStatus): Promise<Partial<OutpatientEntity>> {
+
+        const { id_rawat_jalan, id_patient, id_doctor, visit_date, status_rawat_jalan, verifikasi_status } = await this.prisma.rawatJalan.update({
+            where: {
+                id_rawat_jalan: outpatientId
+            },
+            data: {
+                verifikasi_status: status
+            }
+        });
+
+        return {
+            id_doctor,
+            id_rawat_jalan
+        };
+    }
 
     async updateById(id: number | string, data: OutpatientEntity): Promise<void> {
         await this.prisma.rawatJalan.update({
@@ -64,6 +76,17 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
             data: {
                 visit_date: data.visit_date,
                 id_doctor: data.id_doctor,
+            }
+        })
+    }
+
+    async updateStatusByOutpatientId(outpatientIdDB, verifyStatusOutpatient) {
+        await this.prisma.rawatJalan.update({
+            where: {
+                id_rawat_jalan: outpatientIdDB
+            },
+            data: {
+                verifikasi_status: verifyStatusOutpatient
             }
         })
     }

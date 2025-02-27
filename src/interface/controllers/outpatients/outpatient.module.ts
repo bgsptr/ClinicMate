@@ -8,6 +8,8 @@ import { CreateOutpatientMapper } from "src/core/domain/mappers/outpatients/crea
 import { PatientRepository } from "src/infrastructure/repositories/patient.repository";
 import { DoctorRepository } from "src/infrastructure/repositories/doctor.repository";
 import { QueueOutpatientRepository } from "src/infrastructure/repositories/queue-outpatient.repsoitory";
+import { ScheduleRepository } from "src/infrastructure/repositories/schedule.repository";
+import { CreateQueueOutpatientMapper } from "src/core/domain/mappers/queue-outpatient/create-queue-outpatient.mapper";
 
 
 @Module({
@@ -17,6 +19,8 @@ import { QueueOutpatientRepository } from "src/infrastructure/repositories/queue
         PatientRepository,
         DoctorRepository,
         QueueOutpatientRepository,
+        ScheduleRepository,
+        CreateQueueOutpatientMapper,
         CreateOutpatientMapper,
         CreateOutpatietUsecase,
         UpdateVerificationStatusUsecase,
@@ -25,16 +29,20 @@ import { QueueOutpatientRepository } from "src/infrastructure/repositories/queue
             provide: CreateOutpatietUsecase,
             useFactory: (
                 outpatientRepository: OutpatientRepository,
-                createOutpatientMapper: CreateOutpatientMapper
-            ) => new CreateOutpatietUsecase(outpatientRepository, createOutpatientMapper),
-            inject: [OutpatientRepository, CreateOutpatientMapper]
+                createOutpatientMapper: CreateOutpatientMapper,
+                createQueueOutpatientMapper: CreateQueueOutpatientMapper,
+                queueOutpatientRepository: QueueOutpatientRepository,
+            ) => new CreateOutpatietUsecase(outpatientRepository, createOutpatientMapper, createQueueOutpatientMapper, queueOutpatientRepository),
+            inject: [OutpatientRepository, CreateOutpatientMapper, CreateQueueOutpatientMapper, QueueOutpatientRepository]
         },
         {
             provide: UpdateVerificationStatusUsecase,
             useFactory: (
                 outpatientRepository: OutpatientRepository,
-            ) => new UpdateVerificationStatusUsecase(outpatientRepository),
-            inject: [OutpatientRepository]
+                queueOutpatientRepository: QueueOutpatientRepository,
+                scheduleRepository: ScheduleRepository,
+            ) => new UpdateVerificationStatusUsecase(outpatientRepository, queueOutpatientRepository, scheduleRepository),
+            inject: [OutpatientRepository, QueueOutpatientRepository, ScheduleRepository]
         },
         {
             provide: FetchOutpatientsWithoutFilterUsecase,

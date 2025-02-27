@@ -6,6 +6,8 @@ export class QueueOutpatientEntity {
         public id_rawat_jalan: string,
         public queue_no: number,
         public queue_status: QueueStatus,
-        public rawat_jalan_date: Date,
+        public rawat_jalan_date: string,
+        public queue_start_time?: string,
+        public queue_end_time?: string,
     ) {}
 }

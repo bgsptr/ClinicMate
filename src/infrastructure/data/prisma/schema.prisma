@@ -55,6 +55,7 @@ model RawatJalan {
   id_doctor      String
   visit_date     DateTime
   status_rawat_jalan RawatJalanStatus
+  verifikasi_status  VerificationStatus?
   medical_record MedicalRecord[]
   queue          RawatJalanQueue?
 }
@@ -74,13 +75,21 @@ enum RawatJalanStatus {
   UNFINISHED
 }
 
+enum VerificationStatus {
+  ACCEPTED
+  REJECTED
+  PENDING
+}
+
 model RawatJalanQueue {
   id_queue         Int           @id @default(autoincrement())
   rawatjalan       RawatJalan    @relation(fields: [id_rawat_jalan], references: [id_rawat_jalan])
   id_rawat_jalan   String        @unique
   queue_no         Int
+  queue_start_time String?
+  queue_end_time   String?
   queue_status     QueueStatus
-  rawat_jalan_date DateTime
+  rawat_jalan_date String
 }
 
 enum QueueStatus {

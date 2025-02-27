@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
 import { CreateOutpatientDto } from "src/core/domain/interfaces/dtos/outpatients/create-outpatient.dto";
+import { OutpatientStatus, VerificationStatus } from "src/core/domain/interfaces/types/enum.type";
 import { CreateOutpatietUsecase } from "src/use-cases/outpatient/create-outpatient.use-case";
 import { FetchOutpatientsWithoutFilterUsecase } from "src/use-cases/outpatient/fetch-outpatients.use-case";
 import { UpdateVerificationStatusUsecase } from "src/use-cases/outpatient/update-verification.use-case";
@@ -24,10 +25,10 @@ export class OutpatientController {
         await this.createOutpatietUsecase.execute(createOutpatientDto);
     }
 
-    // @Patch(":outpatient_id")
-    // async updateOutpatient(@Param('outpatient_id') outpatientId: string, @Body() updateOutpatientDto: Partial<CreateOutpatientDto>) {
-    //     await this.updateVerificationStatusUsecase.execute()
-    // }
+    @Patch(":outpatient_id")
+    async updateOutpatient(@Param('outpatient_id') outpatientId: string, @Body() data: { finished_status?: OutpatientStatus, verify_status?: boolean }) {
+        await this.updateVerificationStatusUsecase.execute(outpatientId, data.verify_status, data.finished_status);
+    }
 
     @Get()
     async getAllOutpatients() {

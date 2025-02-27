@@ -1,8 +1,9 @@
 import { Repository } from "src/core/base/repository";
 import { BaseRepository } from "./base.repository";
 import { ScheduleEntity } from "src/core/domain/entities/schedule.entity";
+import { IScheduleRepository } from "src/core/domain/interfaces/repositories/schedule.repository.interface";
 
-export class ScheduleRepository extends BaseRepository implements Repository<ScheduleEntity> {
+export class ScheduleRepository extends BaseRepository implements IScheduleRepository {
     async create(data: ScheduleEntity): Promise<void> {
         await this.prisma.schedule.create({
             data: {

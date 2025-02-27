@@ -8,7 +8,7 @@ export class CreateOutpatientMapper implements IMapper<CreateOutpatientDto, Outp
     mapFromDto(input: CreateOutpatientDto, outPatientId: string, visitDate: Date, ...args: any): OutpatientEntity {
         return new OutpatientEntity(
             outPatientId,
-            input.patientId,
+            String(input.patientId),
             input.doctorId,
             visitDate,
             OutpatientStatus.UNFINISHED,
