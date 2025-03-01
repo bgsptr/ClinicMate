@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { ScheduleControler } from "./schedule.controller";
 import { ScheduleRepository } from "src/infrastructure/repositories/schedule.repository";
 import { CreateScheduleUsecase } from "src/use-cases/admins/create-schedule.use-case";
@@ -10,6 +10,7 @@ import { FetchScheduleMapper } from "src/core/domain/mappers/admins/fetch-schedu
 import { MasterScheduleAccessUsecase } from "src/use-cases/schedules/master-schedule-access.use-case";
 import { DoctorRepository } from "src/infrastructure/repositories/doctor.repository";
 import { ScheduleDoctorIdUseCase } from "src/use-cases/schedules/schedule-doctorid.use-case";
+import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
 
 @Module({
     controllers: [ScheduleControler],
@@ -64,4 +65,10 @@ import { ScheduleDoctorIdUseCase } from "src/use-cases/schedules/schedule-doctor
     ]
 })
 
-export class ScheduleModule {}
+export class ScheduleModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+        .apply(AuthMiddleware)
+        .forRoutes('schedule');
+    }
+}

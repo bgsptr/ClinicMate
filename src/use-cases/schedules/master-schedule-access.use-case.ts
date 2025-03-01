@@ -52,7 +52,7 @@ export class MasterScheduleAccessUsecase {
 
     }
 
-    async execute() {
+    async execute(doctorId: string | null) {
         const data = new Map<string, SchedulesObject>();
         const doctors = await this.doctorRepository.findAllDoctor();
         const schedules = await this.scheduleRepository.findAllSchedule();
@@ -61,11 +61,13 @@ export class MasterScheduleAccessUsecase {
 
         const resultArray = Array.from(data.values());
 
-        console.log(resultArray)
+        const filteredResultArray = resultArray.find((res) => !doctorId || res.doctor_id === doctorId);
+
+        // console.log(filteredResultArray);
 
         return this.fetchScheduleMapper.mapToResponseJson(
             "schedule fetched successfully",
-            resultArray
+            doctorId ? filteredResultArray : resultArray
         )
     }
 }

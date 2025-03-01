@@ -19,4 +19,21 @@ export class TimeUtil {
     static capitalizeFirstLetter(str: string): string {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
+
+    static parseStringTime(time: Date): number {
+        const times = time.getTime() - (8 * 3600 * 1000);
+        return times;
+        // const timeconvert = new Date(times);
+        // return timeconvert.toTimeString().split(" ")[0];
+    }
+
+    static generateStartTimeAndEndTime(time: number): { startTime: string; endTime: string } {
+        const startTime = new Date(time);
+        const endTime = new Date(time + 10 * 60 * 1000);
+    
+        return {
+            startTime: startTime.toTimeString().split(" ")[0],
+            endTime: endTime.toTimeString().split(" ")[0],
+        };
+    }
 }

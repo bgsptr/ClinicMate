@@ -3,6 +3,17 @@ import { BaseRepository } from "./base.repository";
 import { QueueOutpatientEntity } from "src/core/domain/entities/queue-outpatient.entity";
 import { QueueStatus } from "src/core/domain/interfaces/types/enum.type";
 
+export interface QueueOutpatientJoin {
+    id_queue: number;
+    id_rawat_jalan: string;
+    queue_no: number;
+    queue_start_time: string | null;
+    queue_end_time: string | null;
+    queue_status: QueueStatus;
+    rawat_jalan_date: string;
+    rawatjalan: { id_doctor: string }
+}
+
 export class QueueOutpatientRepository extends BaseRepository implements IQueueOutpatientRepository {
     async findAllByOutpatientIds(outpatientIds: string[]) {
         return await this.prisma.rawatJalanQueue.findMany({
@@ -49,5 +60,18 @@ export class QueueOutpatientRepository extends BaseRepository implements IQueueO
         })
     }
 
+    async fetchSelectedQueueDoctorDate(id_doctor: string): Promise<QueueOutpatientJoin[]> {
+        return this.prisma.rawatJalanQueue.findMany({
+            where: {
+                queue_status: { not: QueueStatus.WAITING },
+                rawatjalan: { id_doctor }
+            },
+            include: {
+                rawatjalan: {
+                    select: { id_doctor: true }
+                }
+            }
+        });
+    }
     
 }

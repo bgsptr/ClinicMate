@@ -9,12 +9,10 @@ export class CreatePatientInformationUsecase {
     ) {}
 
     async execute(data: CoreUserInformationDto, email: string) {
-        const birthArray = data.birth_date.split('-');
+        const [year, month, date] = data.birth_date.split('-').map(Number);
         const dateArr: number[] = [];
-        for (let val in birthArray) {
-            dateArr.push(Number(val));
-        }
-        const updatedDate = new Date(dateArr[0], dateArr[1] - 1, dateArr[0]);
+
+        const updatedDate = new Date(year, month - 1, date + 1, 0, 0, 0);
         const convertedBirthDate = updatedDate;
         const patientData = this.corePatientMapper.mapFromDto(data, email, convertedBirthDate);
         await this.patientRepository.create(patientData);

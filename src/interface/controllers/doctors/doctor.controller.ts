@@ -1,8 +1,9 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Put } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Query } from "@nestjs/common";
 import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { AssignDoctorDto } from "src/core/domain/interfaces/dtos/admins/assign-doctor.dto";
 import { CreateDoctorUsecase } from "src/use-cases/doctors/create-doctor.use-case";
 import { FindDoctorUsecase } from "src/use-cases/doctors/find-doctor.use-case";
+import { FetchAvailableQueueUsecase } from "src/use-cases/doctors/queue/fetch-available-queue.use-case";
 import { ShowAllDoctorUsecase } from "src/use-cases/doctors/show-all-doctor.use-case";
 import { UpdateDoctorUsecase } from "src/use-cases/doctors/update-doctor.use-case";
 
@@ -12,7 +13,8 @@ export class DoctorController {
         public createDoctorUsecase : CreateDoctorUsecase,
         public findDoctorUsecase : FindDoctorUsecase,
         public updateDoctorUsecase : UpdateDoctorUsecase,
-        public showAllDoctorUsecase: ShowAllDoctorUsecase
+        public showAllDoctorUsecase: ShowAllDoctorUsecase,
+        public fetchAvailableQueueUsecase: FetchAvailableQueueUsecase
     ) {}
 
     @Get()
@@ -78,5 +80,12 @@ export class DoctorController {
                 cause: error
             })
         }
+    }
+
+    @Get(":doctor_id/schedules")
+    async fetchAvailableQueueByDoctorId(@Param() params: { doctor_id: string }, @Query() queries: { consult_date: string }) {
+        const { doctor_id } = params;
+        const { consult_date } = queries;
+        return await this.fetchAvailableQueueUsecase.execute(doctor_id, consult_date);
     }
 }

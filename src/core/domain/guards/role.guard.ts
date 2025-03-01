@@ -1,13 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { Roles } from "src/core/domain/decorators/roles.decorator";
+import { FetchRoles } from "../decorators/roles.decorator";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(private reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
-        const rolesInHandlerLevel = this.reflector.get<string[]>(Roles, context.getHandler())
+        const rolesInHandlerLevel = this.reflector.get<string[]>(FetchRoles, context.getHandler())
 
         if (!rolesInHandlerLevel || rolesInHandlerLevel.length === 0) return true;
 

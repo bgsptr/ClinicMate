@@ -31,8 +31,8 @@ export class OutpatientController {
     }
 
     @Get()
-    async getAllOutpatients() {
-        return await this.fetchOutpatientsWithoutFilterUsecase.execute()
+    async getAllOutpatients(@Query() query: QueryOutpatient) {
+        return await this.fetchOutpatientsWithoutFilterUsecase.execute(query)
     }
 
     // @Get()

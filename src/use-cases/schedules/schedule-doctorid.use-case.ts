@@ -14,8 +14,11 @@ export class ScheduleDoctorIdUseCase {
             return
         }
 
+        console.log(role);
+
         switch (role) {
             case "ADMIN":
+                console.log(doctorId);
                 return await this.scheduleRepository.findByIdDoctor(doctorId);
             case "PATIENT":
                 // throw error

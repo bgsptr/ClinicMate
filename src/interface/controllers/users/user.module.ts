@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module } from "@nestjs/common";
 import { UserController } from "./user.controller";
 import { Register } from "src/use-cases/users/register/register.use-case";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
@@ -6,6 +6,7 @@ import { AuthAccountMapper } from "src/core/domain/mappers/users/auth-account.ma
 import { Hasher } from "src/provider/bcrypt.provider";
 import { GetBiodata } from "src/use-cases/users/get-biodata/get-biodata.use-case";
 import { Login } from "src/use-cases/users/login/login.use-case";
+import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
 
 @Module({
     controllers: [UserController],
@@ -41,4 +42,10 @@ import { Login } from "src/use-cases/users/login/login.use-case";
     ]
 })
 
-export class UserModule {}
+export class UserModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+        .apply(AuthMiddleware)
+        .forRoutes('users/me');
+    }
+}

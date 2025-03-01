@@ -16,9 +16,12 @@ export class FetchScheduleMapper implements IMapper<SchedulesDto, ScheduleEntity
     }
 
     mapFromEntity(output: ScheduleEntity, ...args: any): SchedulesDto {
+        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const dayFormatted = days.find((day, idx) => idx === parseInt(output.day, 10));
+        
         return new SchedulesDto(
             output.id_schedule,
-            output.day,
+            String(dayFormatted) ?? null,
             output.start_time,
             output.end_time,
             output.slot

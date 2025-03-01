@@ -1,5 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
+import { FetchRoles } from "src/core/domain/decorators/roles.decorator";
 import { CreateScheduleDto } from "src/core/domain/interfaces/dtos/doctors/create-schedule.dto";
+import { Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
 import { CreateScheduleUsecase } from "src/use-cases/admins/create-schedule.use-case";
 import { DeleteScheduleUsecase } from "src/use-cases/admins/delete-schedule.use-case";
 import { UpdateScheduleUsecase } from "src/use-cases/admins/update-schedule.use-case";
@@ -32,12 +35,14 @@ export class ScheduleControler {
     }
 
     @Get('doctor/:doctor_id')
-    async findAllScheduleFromEachDoctor(@Param() doctor_id: string) {
-        return await this.scheduleDoctorIdUseCase.execute(doctor_id);
+    async findAllScheduleFromEachDoctor(@Param() params: { doctor_id: string }, @FindEmail() email: string, @FetchRoles() role: Role) {
+        console.log(email)
+        return await this.scheduleDoctorIdUseCase.execute(params.doctor_id, email, role);
     }
 
     @Get()
-    async fetchAllDoctorsSchedule() {
-        return await this.masterScheduleAccessUsecase.execute();
+    async fetchAllDoctorsSchedule(@Query() query: { doctor_id: string }) {
+        const { doctor_id } = query;
+        return await this.masterScheduleAccessUsecase.execute(doctor_id);
     }
 }

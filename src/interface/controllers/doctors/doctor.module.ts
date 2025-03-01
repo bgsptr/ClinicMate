@@ -7,12 +7,17 @@ import { UserRepository } from "src/infrastructure/repositories/user.repository"
 import { FindDoctorUsecase } from "src/use-cases/doctors/find-doctor.use-case";
 import { UpdateDoctorUsecase } from "src/use-cases/doctors/update-doctor.use-case";
 import { ShowAllDoctorUsecase } from "src/use-cases/doctors/show-all-doctor.use-case";
+import { FetchAvailableQueueUsecase } from "src/use-cases/doctors/queue/fetch-available-queue.use-case";
+import { ScheduleRepository } from "src/infrastructure/repositories/schedule.repository";
+import { QueueOutpatientRepository } from "src/infrastructure/repositories/queue-outpatient.repsoitory";
 
 @Module({
     controllers: [DoctorController],
     providers: [
         DoctorRepository,
         UserRepository,
+        ScheduleRepository,
+        QueueOutpatientRepository,
         CreateDoctorMapper,
         {
             provide: CreateDoctorUsecase,
@@ -46,6 +51,14 @@ import { ShowAllDoctorUsecase } from "src/use-cases/doctors/show-all-doctor.use-
                 createDoctorMapper: CreateDoctorMapper
             ) => new ShowAllDoctorUsecase(doctorRepository, createDoctorMapper),
             inject: [DoctorRepository, CreateDoctorMapper]
+        },
+        {
+            provide: FetchAvailableQueueUsecase,
+            useFactory: (
+                scheduleRepository: ScheduleRepository,
+                queueOutpatientRepository: QueueOutpatientRepository
+            ) => new FetchAvailableQueueUsecase(scheduleRepository, queueOutpatientRepository),
+            inject: [ScheduleRepository, QueueOutpatientRepository]
         }
     ]
 })

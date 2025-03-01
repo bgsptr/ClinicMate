@@ -3,6 +3,7 @@ import { DoctorRepository } from "src/infrastructure/repositories/doctor.reposit
 import { OutpatientRepository } from "src/infrastructure/repositories/outpatient.repository";
 import { PatientRepository } from "src/infrastructure/repositories/patient.repository";
 import { QueueOutpatientRepository } from "src/infrastructure/repositories/queue-outpatient.repsoitory";
+import { QueryOutpatient } from "src/interface/controllers/outpatients/outpatient.controller";
 
 export class FetchOutpatientsWithoutFilterUsecase {
     constructor(
@@ -31,7 +32,7 @@ export class FetchOutpatientsWithoutFilterUsecase {
         return new Map(array.map(item => [item[key]!, item.name]));
     }
 
-    async execute() {
+    async execute(query: QueryOutpatient) {
         const outpatients = await this.outpatientRepository.findAll();
         if (!outpatients) return null;
 
@@ -59,6 +60,7 @@ export class FetchOutpatientsWithoutFilterUsecase {
             queue_no: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_no ?? null,
             queue_status: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_status ?? null,
             id_queue: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.id_queue ?? null,
-        }));
+        })).filter(data => !query.status || data.verifikasi_status?.toLowerCase() === query.status)
+        .filter(data => !query.doctor_id || data.id_doctor === query.doctor_id);
     }
 }
