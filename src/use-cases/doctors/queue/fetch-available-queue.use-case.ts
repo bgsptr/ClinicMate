@@ -21,7 +21,7 @@ export class FetchAvailableQueueUsecase {
 
         console.log(`after filtered by date on ${consultDate}: `, filteredAttribute)
 
-        const [year, month, day] = datas[0]?.rawat_jalan_date?.split("-").map(Number);
+        const [year, month, day] = consultDate?.split("-").map(Number);
 
         const date = new Date(year, month - 1, day + 1, 0, 0, 0);
 

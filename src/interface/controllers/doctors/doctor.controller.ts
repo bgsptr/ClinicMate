@@ -86,6 +86,8 @@ export class DoctorController {
     async fetchAvailableQueueByDoctorId(@Param() params: { doctor_id: string }, @Query() queries: { consult_date: string }) {
         const { doctor_id } = params;
         const { consult_date } = queries;
+        console.log("doctor-id", doctor_id);
+        console.log("consult_date", consult_date);
         return await this.fetchAvailableQueueUsecase.execute(doctor_id, consult_date);
     }
 }
