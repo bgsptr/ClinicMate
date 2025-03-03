@@ -5,6 +5,7 @@ import { PatientModule } from './interface/controllers/patients/patient.module';
 import { DoctorModule } from './interface/controllers/doctors/doctor.module';
 import { ScheduleModule } from './interface/controllers/schedules/schedule.module';
 import { OutpatientModule } from './interface/controllers/outpatients/outpatient.module';
+import { ChatbotModule } from './interface/websockets/chatbots/chatbot.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { OutpatientModule } from './interface/controllers/outpatients/outpatient
     DoctorModule,
     ScheduleModule,
     OutpatientModule,
+    ChatbotModule,
     ConfigModule.forRoot()],
   // controllers: [AppController],
   // providers: [AppService],

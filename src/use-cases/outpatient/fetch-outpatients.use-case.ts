@@ -1,4 +1,3 @@
-import { OutpatientEntity } from "src/core/domain/entities/outpatient.entity";
 import { DoctorRepository } from "src/infrastructure/repositories/doctor.repository";
 import { OutpatientRepository } from "src/infrastructure/repositories/outpatient.repository";
 import { PatientRepository } from "src/infrastructure/repositories/patient.repository";
