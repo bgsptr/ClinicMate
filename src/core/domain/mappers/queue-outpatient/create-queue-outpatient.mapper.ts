@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 export class CreateQueueOutpatientMapper implements IMapper<CreateQueueOutpatientDto, QueueOutpatientEntity, ResponseDto> {
     mapFromDto(input: CreateQueueOutpatientDto, ...args: any): QueueOutpatientEntity {
         return new QueueOutpatientEntity(
-            10,
+            // 10,
             input.outpatientId,
             input.queueOutpatientNo,
             QueueStatus.WAITING,

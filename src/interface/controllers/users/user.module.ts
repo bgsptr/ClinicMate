@@ -7,6 +7,7 @@ import { Hasher } from "src/provider/bcrypt.provider";
 import { GetBiodata } from "src/use-cases/users/get-biodata/get-biodata.use-case";
 import { Login } from "src/use-cases/users/login/login.use-case";
 import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
+import { GetRoleUsecase } from "src/use-cases/users/get-roles/get-role.use-case";
 
 @Module({
     controllers: [UserController],
@@ -38,6 +39,13 @@ import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
                 authAccountMapper: AuthAccountMapper
             ) => new Login(userRepository, hasher, authAccountMapper),
             inject: [UserRepository, Hasher, AuthAccountMapper]
+        },
+        {
+            provide: GetRoleUsecase,
+            useFactory: (
+                userRepository: UserRepository,
+            ) => new GetRoleUsecase(userRepository),
+            inject: [UserRepository]
         }
     ]
 })
@@ -46,6 +54,6 @@ export class UserModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
         .apply(AuthMiddleware)
-        .forRoutes('users/me');
+        .forRoutes('users/me', 'users/role');
     }
 }

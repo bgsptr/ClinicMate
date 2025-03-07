@@ -10,12 +10,14 @@ import { Login } from "src/use-cases/users/login/login.use-case";
 import { Register } from "src/use-cases/users/register/register.use-case";
 import { UpdateRoleOrDataUserUsecase } from "src/use-cases/users/change-data/change-data.use-case";
 import { Response } from "express";
+import { GetRoleUsecase } from "src/use-cases/users/get-roles/get-role.use-case";
 // import { UpdateAccount } from "src/use-cases/users/update-account/update-account.use-case";
 
 @Controller('users')
 export class UserController {
     constructor(
         private readonly getBiodataUseCase: GetBiodata,
+        private readonly getRoleUsecase: GetRoleUsecase,
         private readonly register: Register,
         private readonly login: Login,
         // private readonly updateRoleOrDataUserUsecase: UpdateRoleOrDataUserUsecase,
@@ -61,7 +63,38 @@ export class UserController {
             }
          )
         }
+    }
 
+    @Get('role')
+    async getRoleUser(@FindEmail() email: string, @Res() res: Response) {
+        try {
+            const role = await this.getRoleUsecase.execute(email);
+
+            return res.status(200).json({
+                success: true,
+                message: "Login successful",
+                role,
+            });
+
+        } catch (error) {
+            const data = JSON.parse(error?.message);
+            console.log(data)
+            throw new HttpException({
+                error: true,
+                message: data?.message
+            }, data?.statusCode, {
+                cause: error
+            }
+         )
+        }
+    }
+
+    @Post('logout')
+    async logout(@Res() res: Response) {
+        res.clearCookie('token', {
+            httpOnly: true
+        })
+        return res.json({ message: 'Logged out successfully' });
     }
 
     // @Put(':email/role')

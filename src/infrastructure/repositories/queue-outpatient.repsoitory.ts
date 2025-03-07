@@ -28,9 +28,9 @@ export class QueueOutpatientRepository extends BaseRepository implements IQueueO
     async create(queue: QueueOutpatientEntity): Promise<void> {
         await this.prisma.rawatJalanQueue.create({
             data: {
-                id_queue: queue.id_queue,
+                // id_queue: queue.id_queue,
                 id_rawat_jalan: queue.id_rawat_jalan,
-                queue_no: queue.queue_no,
+                queue_no: Number(queue.queue_no),
                 queue_status: queue.queue_status,
                 rawat_jalan_date: queue.rawat_jalan_date
             }

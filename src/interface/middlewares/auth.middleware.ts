@@ -25,12 +25,14 @@ export class AuthMiddleware implements NestMiddleware {
         // console.log(authorization)
         const token = authorization?.split(' ')[1];
 
-        if (!token) return res.status(401).json({
-            error: true,
-            message: "token is missing"
-        })
+        console.log("token", req.cookies.token)
 
-        jwt.verify(token, process.env.SECRET_KEY || "secret", (err, decoded: jwt.JwtPayload) => {
+        // if (!token) return res.status(401).json({
+        //     error: true,
+        //     message: "token is missing"
+        // })
+
+        jwt.verify(req.cookies.token, process.env.SECRET_KEY || "secret", (err: any, decoded: jwt.JwtPayload) => {
             if (err) {
                 if (err.name === "TokenExpiredError") {
                     return res.status(401).json({
