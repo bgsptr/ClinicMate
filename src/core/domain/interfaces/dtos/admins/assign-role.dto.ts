@@ -13,6 +13,7 @@ export class AssignRoleDto extends CoreUserInformationDto {
         birth_date: string,
         gender: Gender,
         domicile: string,
+        phone_number: string,
         public role: Role
     ) {
         super(
@@ -20,7 +21,8 @@ export class AssignRoleDto extends CoreUserInformationDto {
             birth_place,
             birth_date,
             gender,
-            domicile
+            domicile,
+            phone_number
         )
     }
 }

@@ -38,6 +38,12 @@ export class PatientRepository extends BaseRepository implements IPatientReposit
         })
     }
 
+    async showWithoutCatchError(email: string): Promise<PatientEntity | null> {
+        return await this.prisma.patient.findFirst({
+            where: { email }
+        })
+    }
+
     async showAll(index: number): Promise<PatientEntity[]> {
         return await this.prisma.patient.findMany({
             take: 10,

@@ -6,12 +6,19 @@ import { CreatePatientInformationUsecase } from "src/use-cases/patients/create-i
 import { ShowInformationUsecase } from "src/use-cases/patients/show-information/show-information.use-case";
 import { FetchAllPatientUsecase } from "src/use-cases/patients/fetch-all-patient.use-case";
 import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
+import { Register } from "src/use-cases/users/register/register.use-case";
+import { UserRepository } from "src/infrastructure/repositories/user.repository";
+import { AuthAccountMapper } from "src/core/domain/mappers/users/auth-account.mapper";
+import { Hasher } from "src/provider/bcrypt.provider";
 
 @Module({
     controllers: [PatientController],
     providers: [
         PatientRepository,
         CorePatientMapper,
+        UserRepository,
+        Hasher,
+        AuthAccountMapper,
         {
             provide: CreatePatientInformationUsecase,
             useFactory: (
@@ -35,6 +42,15 @@ import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
                 corePatientMapper: CorePatientMapper,
             ) => new FetchAllPatientUsecase(patientRepository, corePatientMapper),
             inject: [PatientRepository, CorePatientMapper]
+        },
+        {
+            provide: Register,
+            useFactory: (
+                userRepository: UserRepository,
+                hasher: Hasher,
+                authAccountMapper: AuthAccountMapper
+            ) => new Register(userRepository, hasher, authAccountMapper),
+            inject: [UserRepository, Hasher, AuthAccountMapper]
         }
     ]
 })

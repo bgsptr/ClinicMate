@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { FetchRoles } from "src/core/domain/decorators/roles.decorator";
-import { RolesGuard } from "src/core/domain/guards/role.guard";
-import { CoreUserInformationDto } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
+import { CoreUserInformationDto, Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
+import { RegisterDto } from "src/core/domain/interfaces/dtos/users/register.dto";
 import { CreatePatientInformationUsecase } from "src/use-cases/patients/create-information/create-information.use-case";
 import { FetchAllPatientUsecase } from "src/use-cases/patients/fetch-all-patient.use-case";
 import { ShowInformationUsecase } from "src/use-cases/patients/show-information/show-information.use-case";
+import { Register } from "src/use-cases/users/register/register.use-case";
 
 export interface QueryPatientDto {
     index: number | null;
@@ -18,7 +19,8 @@ export class PatientController {
     constructor(
         private createInformationUsecase: CreatePatientInformationUsecase,
         private showInformationUsecase: ShowInformationUsecase,
-        private fetchAllPatientUsecase : FetchAllPatientUsecase
+        private fetchAllPatientUsecase : FetchAllPatientUsecase,
+        private registerUsecase : Register
     ) {}
 
     // @Roles(['patient', 'admin'])
@@ -31,9 +33,19 @@ export class PatientController {
     // @Roles(['patient', 'admin'])
     // @UseGuards(RolesGuard)
     @Post()
-    async updateData(@FindEmail() email: string, @Body() updateData: CoreUserInformationDto) {
+    async updateData(@FindEmail() email: string, @FetchRoles() roles: Role, @Body() bodyData: CoreUserInformationDto) {
         console.log(email);
-        return await this.createInformationUsecase.execute(updateData, email);
+        console.log("current user role: ", roles);
+        console.log("inserted email: ", bodyData.email);
+        if (bodyData.email && roles === Role.ADMIN) {
+            const registerDto: RegisterDto = new RegisterDto(bodyData.email, "");
+            await this.registerUsecase.execute(registerDto);
+            console.log("admin create patient");
+            return await this.createInformationUsecase.execute(bodyData, bodyData.email);
+        }
+
+        console.log("patient update data");
+        return await this.createInformationUsecase.execute(bodyData, email);
     }
 
     // @Get()

@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, Query } from "@nestjs/common";
+import { FetchRoles } from "src/core/domain/decorators/roles.decorator";
 import { CreateOutpatientDto } from "src/core/domain/interfaces/dtos/outpatients/create-outpatient.dto";
+import { Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
 import { OutpatientStatus, VerificationStatus } from "src/core/domain/interfaces/types/enum.type";
 import { CreateOutpatietUsecase } from "src/use-cases/outpatient/create-outpatient.use-case";
 import { FetchOutpatientsWithoutFilterUsecase } from "src/use-cases/outpatient/fetch-outpatients.use-case";
@@ -21,8 +23,11 @@ export class OutpatientController {
     ) {}
 
     @Post()
-    async createNewOutpatient(@Body() createOutpatientDto: CreateOutpatientDto) {
-        await this.createOutpatietUsecase.execute(createOutpatientDto);
+    async createNewOutpatient(@Body() createOutpatientDto: CreateOutpatientDto, @FetchRoles() role: Role) {
+        const outpatientId = await this.createOutpatietUsecase.execute(createOutpatientDto, role);
+        if (outpatientId && role === Role.ADMIN) {
+            await this.updateVerificationStatusUsecase.handleAcceptedStatus(outpatientId, createOutpatientDto.doctorId)
+        }
     }
 
     @Patch(":outpatient_id")

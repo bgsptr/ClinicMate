@@ -29,21 +29,45 @@ export class UpdateVerificationStatusUsecase {
         }
     }
 
-    private async handleAcceptedStatus(outpatientIdDB: string, id_doctor: string) {
-        const scheduleDoctors: ScheduleEntity[] = await this.scheduleRepository.findByIdDoctor(id_doctor);
-        const { rawat_jalan_date: outpatientDate, queue_no: queueNo } = 
-            await this.queueOutpatientRepository.updateById(outpatientIdDB);
-        
-        const schedule = this.getDoctorSchedule(scheduleDoctors, outpatientDate);
-        if (!schedule) return;
-
-        const { queueStartDB, queueEndDB } = this.calculateQueueTime(schedule, queueNo);
-
-        await this.queueOutpatientRepository.updateById(outpatientIdDB, {
-            queue_start_time: queueStartDB,
-            queue_end_time: queueEndDB,
-        });
+    public async handleAcceptedStatus(outpatientIdDB: string, id_doctor: string) {
+        try {
+            // Fetch schedule and outpatient queue data concurrently
+            const [scheduleDoctors, queueOutpatient] = await Promise.all([
+                this.scheduleRepository.findByIdDoctor(id_doctor),
+                this.queueOutpatientRepository.findById(outpatientIdDB) // Change updateById → findById
+            ]);
+    
+            if (!queueOutpatient) {
+                console.warn(`Queue data not found for outpatient ID: ${outpatientIdDB}`);
+                return;
+            }
+    
+            const { rawat_jalan_date: outpatientDate, queue_no: queueNo } = queueOutpatient;
+    
+            // Get schedule based on outpatient date
+            const schedule = this.getDoctorSchedule(scheduleDoctors, outpatientDate);
+            if (!schedule) {
+                console.warn(`No schedule found for doctor ID: ${id_doctor} on date: ${outpatientDate}`);
+                return;
+            }
+    
+            // Calculate queue times
+            const { queueStartDB, queueEndDB } = this.calculateQueueTime(schedule, queueNo);
+    
+            // Update queue outpatient with new times
+            await this.queueOutpatientRepository.updateById(outpatientIdDB, {
+                queue_start_time: queueStartDB,
+                queue_end_time: queueEndDB,
+            });
+    
+            console.log(`Updated queue times for outpatient ID: ${outpatientIdDB}`);
+    
+        } catch (error) {
+            console.error(`Error handling accepted status: ${error.message}`);
+            throw error;
+        }
     }
+    
 
     private getDoctorSchedule(scheduleDoctors: ScheduleEntity[], outpatientDate: string): ScheduleEntity | undefined {
         const [year, month, date] = outpatientDate.split("-").map(Number);

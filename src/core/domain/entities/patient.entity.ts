@@ -8,6 +8,6 @@ export class PatientEntity {
         public birth_date: Date,
         public gender: Gender,
         public address: string,
-        public phone_number?: string
+        public phone_number: string,
     ) {}
 }

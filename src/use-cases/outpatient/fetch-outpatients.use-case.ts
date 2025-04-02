@@ -59,7 +59,22 @@ export class FetchOutpatientsWithoutFilterUsecase {
             queue_no: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_no ?? null,
             queue_status: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_status ?? null,
             id_queue: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.id_queue ?? null,
+            rawat_jalan_date: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.rawat_jalan_date ?? null,
+            queue_start_time: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_start_time ?? null,
+            queue_end_time: queueOutpatients.filter(val => val.id_rawat_jalan === outpatient.id_rawat_jalan)[0]?.queue_end_time ?? null,
         })).filter(data => !query.status || data.verifikasi_status?.toLowerCase() === query.status)
-        .filter(data => !query.doctor_id || data.id_doctor === query.doctor_id);
+        .filter(data => !query.doctor_id || data.id_doctor === query.doctor_id)
+        .filter(data => !query.keyword || data.id_patient.includes(query.keyword) || data.patient_name.includes(query.keyword))
+        .filter(data => {
+            console.log("filter of query name must consult_date")
+            if (query.consult_date) {
+                console.log("filter date success")
+                const [year, month, date] = query.consult_date.split("-").map(Number);
+                const dateRebuild = new Date(year, month - 1, date + 1).toISOString().split("T")[0];
+                console.log(`${dateRebuild} vs ${data.rawat_jalan_date}`)
+                return data.rawat_jalan_date === dateRebuild;
+            }
+            return true;
+        });
     }
 }

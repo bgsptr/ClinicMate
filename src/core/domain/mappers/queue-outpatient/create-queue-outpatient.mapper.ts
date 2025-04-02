@@ -1,6 +1,7 @@
 import { OutpatientEntity } from "../../entities/outpatient.entity";
 import { QueueOutpatientEntity } from "../../entities/queue-outpatient.entity";
 import { CreateQueueOutpatientDto } from "../../interfaces/dtos/queue-outpatients/create-queue-outpatient.dto";
+import { Role } from "../../interfaces/dtos/users/core-user-information.dto";
 import { ResponseDto } from "../../interfaces/dtos/users/response.dto";
 import { IMapper } from "../../interfaces/providers/mapper.provider.interface";
 import { QueueStatus } from "../../interfaces/types/enum.type";

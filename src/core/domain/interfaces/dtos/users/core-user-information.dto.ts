@@ -27,5 +27,7 @@ export class CoreUserInformationDto {
         public birth_date: string,
         public gender: Gender,
         public domicile: string,
+        public phone_number: string,
+        public email?: string
     ) {}
 }

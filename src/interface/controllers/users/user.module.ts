@@ -8,11 +8,13 @@ import { GetBiodata } from "src/use-cases/users/get-biodata/get-biodata.use-case
 import { Login } from "src/use-cases/users/login/login.use-case";
 import { AuthMiddleware } from "src/interface/middlewares/auth.middleware";
 import { GetRoleUsecase } from "src/use-cases/users/get-roles/get-role.use-case";
+import { PatientRepository } from "src/infrastructure/repositories/patient.repository";
 
 @Module({
     controllers: [UserController],
     providers: [
         UserRepository,
+        PatientRepository,
         Hasher,
         AuthAccountMapper,
         {
@@ -27,9 +29,10 @@ import { GetRoleUsecase } from "src/use-cases/users/get-roles/get-role.use-case"
         {
             provide: GetBiodata,
             useFactory: (
-                userRepository: UserRepository
-            ) => new GetBiodata(userRepository),
-            inject: [UserRepository]
+                userRepository: UserRepository,
+                patientRepository: PatientRepository
+            ) => new GetBiodata(userRepository, patientRepository),
+            inject: [UserRepository, PatientRepository]
         },
         {
             provide: Login,

@@ -13,7 +13,7 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
                 id_doctor: data.id_doctor,
                 visit_date: data.visit_date,
                 status_rawat_jalan: OutpatientStatus.UNFINISHED,
-                verifikasi_status: VerificationStatus.PENDING
+                verifikasi_status: data.verifikasi_status
             }
         })
 

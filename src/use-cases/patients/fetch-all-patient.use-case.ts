@@ -19,10 +19,17 @@ export class FetchAllPatientUsecase {
             // patients[idx].birth_date = val.birth_date.toDateString();
         })
 
-        if (date) {
+        //patient.birth_date.toString().split("T")[0] === date
 
-        }
+        const filteredPatient = (date || keyword) ? patients.filter(patient => {
+            const matchesKeyword = keyword && (patient.id_patient.includes(keyword) || patient.name.includes(keyword));
+            const matchesDate = date && patient.birth_date.toISOString().split("T")[0] === date;
 
-        return patients;
+            if (keyword && !date) return matchesKeyword;
+            if (date && !keyword) return matchesDate;
+            return matchesKeyword && matchesDate;
+        }) : patients;
+
+        return filteredPatient;
     }
 }

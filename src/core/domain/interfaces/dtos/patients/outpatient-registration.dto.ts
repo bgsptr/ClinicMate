@@ -7,7 +7,7 @@ export class OutpatientRegistrationDto extends CoreUserInformationDto {
         birth_date: string,
         gender: Gender,
         domicile: string,
-        public phone_number: string,
+        phone_number: string,
         public email: string,
         public doctor_id: string,
         public consultation_date: Date,
@@ -19,7 +19,8 @@ export class OutpatientRegistrationDto extends CoreUserInformationDto {
             birth_place,
             birth_date,
             gender,
-            domicile
+            domicile,
+            phone_number
         );
     }
 }
