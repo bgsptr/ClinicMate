@@ -67,4 +67,15 @@ export class PatientRepository extends BaseRepository implements IPatientReposit
             }
         })
     }
+
+    async findEmailByPatientId(id_patient: string): Promise<string> {
+        const { email } = await this.prisma.patient.findFirstOrThrow({
+            where: { id_patient },
+            select: {
+                email: true
+            }
+        })
+
+        return email;
+    }
 }

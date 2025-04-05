@@ -11,8 +11,14 @@ import { QueueOutpatientRepository } from 'src/infrastructure/repositories/queue
 import { ScheduleRepository } from 'src/infrastructure/repositories/schedule.repository';
 import { CreateQueueOutpatientMapper } from 'src/core/domain/mappers/queue-outpatient/create-queue-outpatient.mapper';
 import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
+import { NotificationProducer } from 'src/jobs/notifications/notification.job.producer';
+import { amqpProvider } from 'src/provider/amqp.provider';
+import * as amqplib from 'amqplib';
+import { NotificationModule } from '../notifications/notification.module';
+import { FetchOnlyPatientUsecase } from 'src/use-cases/patients/fetch-only-patient.use-case';
 
 @Module({
+  imports: [NotificationModule],
   controllers: [OutpatientController],
   providers: [
     OutpatientRepository,
@@ -25,6 +31,14 @@ import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
     CreateOutpatietUsecase,
     UpdateVerificationStatusUsecase,
     FetchOutpatientsWithoutFilterUsecase,
+    NotificationProducer,
+    {
+      provide: NotificationProducer,
+      useFactory: (
+        channel: amqplib.Channel
+      ) => new NotificationProducer(channel),
+      inject: ["AMQP_PROVIDER"]
+    },
     {
       provide: CreateOutpatietUsecase,
       useFactory: (
@@ -32,18 +46,21 @@ import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
         createOutpatientMapper: CreateOutpatientMapper,
         createQueueOutpatientMapper: CreateQueueOutpatientMapper,
         queueOutpatientRepository: QueueOutpatientRepository,
+        patientRepository: PatientRepository
       ) =>
         new CreateOutpatietUsecase(
           outpatientRepository,
           createOutpatientMapper,
           createQueueOutpatientMapper,
           queueOutpatientRepository,
+          patientRepository
         ),
       inject: [
         OutpatientRepository,
         CreateOutpatientMapper,
         CreateQueueOutpatientMapper,
         QueueOutpatientRepository,
+        PatientRepository
       ],
     },
     {
@@ -52,16 +69,19 @@ import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
         outpatientRepository: OutpatientRepository,
         queueOutpatientRepository: QueueOutpatientRepository,
         scheduleRepository: ScheduleRepository,
+        notificationProducer: NotificationProducer,
       ) =>
         new UpdateVerificationStatusUsecase(
           outpatientRepository,
           queueOutpatientRepository,
           scheduleRepository,
+          notificationProducer
         ),
       inject: [
         OutpatientRepository,
         QueueOutpatientRepository,
         ScheduleRepository,
+        NotificationProducer
       ],
     },
     {
@@ -85,8 +105,16 @@ import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
         QueueOutpatientRepository,
       ],
     },
+    {
+      provide: FetchOnlyPatientUsecase,
+      useFactory: (
+        patientRepository: PatientRepository
+      ) => new FetchOnlyPatientUsecase(patientRepository),
+      inject: [PatientRepository]
+    }
   ],
 })
+
 export class OutpatientModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(AuthMiddleware).forRoutes('outpatients');

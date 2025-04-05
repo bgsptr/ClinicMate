@@ -6,6 +6,8 @@ import { DoctorModule } from './interface/controllers/doctors/doctor.module';
 import { ScheduleModule } from './interface/controllers/schedules/schedule.module';
 import { OutpatientModule } from './interface/controllers/outpatients/outpatient.module';
 import { ChatbotModule } from './interface/websockets/chatbots/chatbot.module';
+import { amqpProvider } from './provider/amqp.provider';
+import { NotificationModule } from './interface/controllers/notifications/notification.module';
 
 @Module({
   imports: [
@@ -15,8 +17,10 @@ import { ChatbotModule } from './interface/websockets/chatbots/chatbot.module';
     ScheduleModule,
     OutpatientModule,
     ChatbotModule,
+    NotificationModule,
     ConfigModule.forRoot()],
   // controllers: [AppController],
-  // providers: [AppService],
+  providers: [amqpProvider],
+  exports: [amqpProvider],
 })
 export class AppModule {}

@@ -3,10 +3,11 @@ import { BaseRepository } from "./base.repository";
 import { IOutpatientRepository } from "src/core/domain/interfaces/repositories/outpatient.repository.interface";
 import { OutpatientEntity } from "src/core/domain/entities/outpatient.entity";
 import { OutpatientStatus, VerificationStatus } from "src/core/domain/interfaces/types/enum.type";
+import { RawatJalanStatus } from "@prisma/client";
 
 export class OutpatientRepository extends BaseRepository implements IOutpatientRepository {
     async create(data: OutpatientEntity): Promise<Partial<OutpatientEntity>> {
-        const { id_rawat_jalan, status_rawat_jalan, verifikasi_status } = await this.prisma.rawatJalan.create({
+        const { id_rawat_jalan, status_rawat_jalan, verifikasi_status, id_patient } = await this.prisma.rawatJalan.create({
             data: {
                 id_rawat_jalan: data.id_rawat_jalan,
                 id_patient: data.id_patient,
@@ -18,6 +19,7 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
         })
 
         return {
+            id_patient,
             id_rawat_jalan,
             status_rawat_jalan,
             verifikasi_status
@@ -80,7 +82,7 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
         })
     }
 
-    async updateStatusByOutpatientId(outpatientIdDB, verifyStatusOutpatient) {
+    async updateStatusByOutpatientId(outpatientIdDB: string, verifyStatusOutpatient: VerificationStatus) {
         await this.prisma.rawatJalan.update({
             where: {
                 id_rawat_jalan: outpatientIdDB
@@ -89,5 +91,26 @@ export class OutpatientRepository extends BaseRepository implements IOutpatientR
                 verifikasi_status: verifyStatusOutpatient
             }
         })
+    }
+
+    async findEmailJoinOutpatientAndPatientByOutpatientId(outpatientId: string) {
+        const { patient } = await this.prisma.rawatJalan.findFirstOrThrow({
+            include: {
+                patient: {
+                    select: {
+                        email: true
+                    }
+                }
+            },
+            where: {
+                AND: {
+                    id_rawat_jalan: outpatientId,
+                    status_rawat_jalan: RawatJalanStatus.UNFINISHED,
+                    verifikasi_status: VerificationStatus.ACCEPTED
+                }
+            }
+        })
+
+        return patient.email;
     }
 }

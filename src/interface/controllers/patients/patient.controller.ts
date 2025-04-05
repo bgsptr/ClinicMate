@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { Body, ConflictException, Controller, Get, InternalServerErrorException, Post, Query } from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { FetchRoles } from "src/core/domain/decorators/roles.decorator";
 import { CoreUserInformationDto, Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
@@ -37,15 +38,25 @@ export class PatientController {
         console.log(email);
         console.log("current user role: ", roles);
         console.log("inserted email: ", bodyData.email);
-        if (bodyData.email && roles === Role.ADMIN) {
-            const registerDto: RegisterDto = new RegisterDto(bodyData.email, "");
-            await this.registerUsecase.execute(registerDto);
-            console.log("admin create patient");
-            return await this.createInformationUsecase.execute(bodyData, bodyData.email);
+
+        try {
+            if (bodyData.email && roles === Role.ADMIN) {
+                const registerDto: RegisterDto = new RegisterDto(bodyData.email, "");
+                await this.registerUsecase.execute(registerDto);
+                console.log("admin create patient");
+                return await this.createInformationUsecase.execute(bodyData, bodyData.email);
+            }
+    
+            console.log("patient update data");
+            return await this.createInformationUsecase.execute(bodyData, email);
         }
 
-        console.log("patient update data");
-        return await this.createInformationUsecase.execute(bodyData, email);
+        catch(err) {
+            if (err instanceof PrismaClientKnownRequestError) {
+                throw new ConflictException('Email already registered')
+            }
+            throw new InternalServerErrorException(err);
+        }
     }
 
     // @Get()

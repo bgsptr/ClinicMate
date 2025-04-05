@@ -17,7 +17,7 @@ export class ScheduleRepository extends BaseRepository implements IScheduleRepos
         });
     }
 
-    async createAndFetch(data: ScheduleEntity): Promise<ScheduleEntity> {
+    async createAndFetch(data: ScheduleEntity, recordDayInteger: Record<string, string>): Promise<ScheduleEntity> {
         return await this.prisma.schedule.create({
             data: {
                 id_schedule: data.id_schedule,

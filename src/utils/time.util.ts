@@ -9,10 +9,18 @@ export class TimeUtil {
     static convertToLocalTimeAnd24HourFormat(time: string): string {
         const [hours, flag] = time.split(" ");
         console.log(`data: ${hours} and ${flag}`);
-        const hourValue = parseInt(hours.split(":")[0], 10);
-        const hourInUTC = flag === "PM" ? hourValue + 12 : hourValue;
+        let hourValue = parseInt(hours.split(":")[0], 10);
+        // const hourInUTC = flag === "PM" ? hourValue + 12 : hourValue;
+
+        if (flag === "PM" && hourValue !== 12) {
+            hourValue += 12;
+          } else if (flag === "AM" && hourValue === 12) {
+            hourValue = 0;
+          }
+          
         const date = new Date();
-        date.setHours(hourInUTC, 0, 0);
+        // date.setHours(hourInUTC, 0, 0);
+        date.setHours(hourValue + 8, 0, 0);
         return date.toTimeString().split(" ")[0];
     }
 
