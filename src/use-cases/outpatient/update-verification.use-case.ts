@@ -103,7 +103,7 @@ export class UpdateVerificationStatusUsecase {
       const currentDate = new Date(now.getTime() + 8 * 60 * 60 * 1000); // add utc+8 to current time
       const delayTime = date.getTime() - currentDate.getTime(); // change delayTime to range from current ms time until queue start time
       //   console.log('date represent: ', outpatientDate);
-      //   console.log('start time: ', queueStartDB);
+        // console.log('start time: ', queueStartDB);
       //   console.log(`should be date: `, date);
       //   console.log(`should be seconds total: `, date.getTime());
       //   console.log(`should be right now: `, new Date().getTime());
@@ -143,7 +143,7 @@ export class UpdateVerificationStatusUsecase {
     const endTime = end_time.getTime();
     const slotDuration = (endTime - startTime) / slot;
 
-    const startQueueTime = startTime + slotDuration * queueNo - 8 * 3600 * 1000;
+    const startQueueTime = startTime + (slotDuration * (queueNo - 1)) - 8 * 3600 * 1000;
     const endQueueTime = startQueueTime + 10 * 60 * 1000;
 
     return {
