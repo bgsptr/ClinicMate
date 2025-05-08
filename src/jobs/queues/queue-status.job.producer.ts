@@ -1,9 +1,9 @@
 import { Inject } from "@nestjs/common";
+import amqplib from "amqplib";
 import { AmqpUsecase } from "../amqp.use-case";
-import amqplib from 'amqplib';
-import { NotificationEvent } from "src/core/domain/interfaces/events/notification.event";
+import { QueueStatusEvent } from "src/core/domain/interfaces/events/queue-status.event";
 
-export class NotificationProducer extends AmqpUsecase<NotificationEvent> {
+export class QueueStatusProducer extends AmqpUsecase<QueueStatusEvent> {
     constructor(
         @Inject("AMQP_PROVIDER")
         protected readonly channel: amqplib.Channel

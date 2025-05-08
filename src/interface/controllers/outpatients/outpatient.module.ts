@@ -12,10 +12,10 @@ import { ScheduleRepository } from 'src/infrastructure/repositories/schedule.rep
 import { CreateQueueOutpatientMapper } from 'src/core/domain/mappers/queue-outpatient/create-queue-outpatient.mapper';
 import { AuthMiddleware } from 'src/interface/middlewares/auth.middleware';
 import { NotificationProducer } from 'src/jobs/notifications/notification.job.producer';
-import { amqpProvider } from 'src/provider/amqp.provider';
 import * as amqplib from 'amqplib';
 import { NotificationModule } from '../notifications/notification.module';
 import { FetchOnlyPatientUsecase } from 'src/use-cases/patients/fetch-only-patient.use-case';
+import { QueueStatusProducer } from 'src/jobs/queues/queue-status.job.producer';
 
 @Module({
   imports: [NotificationModule],
@@ -32,6 +32,7 @@ import { FetchOnlyPatientUsecase } from 'src/use-cases/patients/fetch-only-patie
     UpdateVerificationStatusUsecase,
     FetchOutpatientsWithoutFilterUsecase,
     NotificationProducer,
+    QueueStatusProducer,
     {
       provide: NotificationProducer,
       useFactory: (
@@ -70,18 +71,21 @@ import { FetchOnlyPatientUsecase } from 'src/use-cases/patients/fetch-only-patie
         queueOutpatientRepository: QueueOutpatientRepository,
         scheduleRepository: ScheduleRepository,
         notificationProducer: NotificationProducer,
+        queueStatusProducer: QueueStatusProducer
       ) =>
         new UpdateVerificationStatusUsecase(
           outpatientRepository,
           queueOutpatientRepository,
           scheduleRepository,
-          notificationProducer
+          notificationProducer,
+          queueStatusProducer
         ),
       inject: [
         OutpatientRepository,
         QueueOutpatientRepository,
         ScheduleRepository,
-        NotificationProducer
+        NotificationProducer,
+        QueueStatusProducer
       ],
     },
     {
@@ -111,7 +115,7 @@ import { FetchOnlyPatientUsecase } from 'src/use-cases/patients/fetch-only-patie
         patientRepository: PatientRepository
       ) => new FetchOnlyPatientUsecase(patientRepository),
       inject: [PatientRepository]
-    }
+    },
   ],
 })
 

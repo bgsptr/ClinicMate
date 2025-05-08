@@ -32,7 +32,7 @@ export class PatientRepository extends BaseRepository implements IPatientReposit
         })
     }
 
-    async show(email: string): Promise<PatientEntity | null> {
+    async show(email: string): Promise<PatientEntity> {
         return await this.prisma.patient.findFirstOrThrow({
             where: { email }
         })
@@ -77,5 +77,17 @@ export class PatientRepository extends BaseRepository implements IPatientReposit
         })
 
         return email;
+    }
+
+    async countTotalPatient() {
+        return await this.prisma.patient.count();
+    }
+
+    async findByPatientId(patientId: string) {
+        return await this.prisma.patient.findUnique({
+            where: {
+                id_patient: patientId
+            }
+        });
     }
 }

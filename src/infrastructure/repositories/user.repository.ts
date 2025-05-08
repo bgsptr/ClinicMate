@@ -44,4 +44,12 @@ export class UserRepository extends BaseRepository implements IUserRepository {
             }
         })
     }
+
+    async findByEmailWithoutThrowErr(email: string) {
+        return await this.prisma.user.findFirst({
+            where: {
+                email
+            }
+        })
+    }
 }

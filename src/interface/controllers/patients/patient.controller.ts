@@ -1,11 +1,16 @@
-import { Body, ConflictException, Controller, Get, InternalServerErrorException, Post, Query } from "@nestjs/common";
+import { Body, ConflictException, Controller, Get, InternalServerErrorException, NotFoundException, Param, Post, Query, Res } from "@nestjs/common";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Response } from "express";
 import { FindEmail } from "src/core/domain/decorators/get-user-email.decorator";
 import { FetchRoles } from "src/core/domain/decorators/roles.decorator";
+import { CustomNotFoundError } from "src/core/domain/errors/not-found.error";
+import { ApiResponse } from "src/core/domain/interfaces/dtos/responses/api-response";
 import { CoreUserInformationDto, Role } from "src/core/domain/interfaces/dtos/users/core-user-information.dto";
 import { RegisterDto } from "src/core/domain/interfaces/dtos/users/register.dto";
 import { CreatePatientInformationUsecase } from "src/use-cases/patients/create-information/create-information.use-case";
 import { FetchAllPatientUsecase } from "src/use-cases/patients/fetch-all-patient.use-case";
+import { SelfInformationPatientUsecase } from "src/use-cases/patients/self-data/fetch-self-information.use-case";
+import { GetPatientUsecase } from "src/use-cases/patients/self-data/get-patient.use-case";
 import { ShowInformationUsecase } from "src/use-cases/patients/show-information/show-information.use-case";
 import { Register } from "src/use-cases/users/register/register.use-case";
 
@@ -21,7 +26,9 @@ export class PatientController {
         private createInformationUsecase: CreatePatientInformationUsecase,
         private showInformationUsecase: ShowInformationUsecase,
         private fetchAllPatientUsecase : FetchAllPatientUsecase,
-        private registerUsecase : Register
+        private registerUsecase : Register,
+        private selfInformationPatientUsecase : SelfInformationPatientUsecase,
+        private getPatientUsecase : GetPatientUsecase
     ) {}
 
     // @Roles(['patient', 'admin'])
@@ -69,5 +76,33 @@ export class PatientController {
         // const { index, keyword, date } = query;
 
         return await this.fetchAllPatientUsecase.execute(query);
+    }
+
+    @Get("/me")
+    async getSelfPatientInformationController(@FindEmail() email: string) {
+        try {
+            return await this.selfInformationPatientUsecase.execute(email);
+        } catch(err) {
+            console.log(err)
+            if (err instanceof CustomNotFoundError) {
+                throw new NotFoundException(err?.message);
+            }
+            throw err;
+        }
+    }
+
+    @Get(":patient_id")
+    async getSomeoneInformation(@Res() res: Response, @Param('patient_id') patientId: string) {
+        try {
+            const data = await this.getPatientUsecase.execute(patientId);
+            const response = new ApiResponse(res, 200, `successfully fetch patient with id ${patientId}`, data);
+            return response.send();
+        } catch(err) {
+            console.log(err)
+            if (err instanceof CustomNotFoundError) {
+                throw new NotFoundException(err?.message);
+            }
+            throw err;
+        }
     }
 }

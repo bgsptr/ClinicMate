@@ -23,7 +23,7 @@ export abstract class AmqpUsecase<T> {
       await this.channel.assertQueue(queueName, { durable: true });
       await this.channel.bindQueue(queueName, exchangeName, routingKey);
       const serializedObj = JSON.stringify(message);
-
+      
       this.channel.publish(exchangeName, routingKey, Buffer.from(serializedObj), {
         contentType: 'application/json',
         headers: {

@@ -1,13 +1,16 @@
 import { ScheduleEntity } from 'src/core/domain/entities/schedule.entity';
 import { NotificationEvent } from 'src/core/domain/interfaces/events/notification.event';
+import { QueueStatusEvent } from 'src/core/domain/interfaces/events/queue-status.event';
 import {
   OutpatientStatus,
+  QueueStatus,
   VerificationStatus,
 } from 'src/core/domain/interfaces/types/enum.type';
 import { OutpatientRepository } from 'src/infrastructure/repositories/outpatient.repository';
 import { QueueOutpatientRepository } from 'src/infrastructure/repositories/queue-outpatient.repsoitory';
 import { ScheduleRepository } from 'src/infrastructure/repositories/schedule.repository';
 import { NotificationProducer } from 'src/jobs/notifications/notification.job.producer';
+import { QueueStatusProducer } from 'src/jobs/queues/queue-status.job.producer';
 
 export class UpdateVerificationStatusUsecase {
   constructor(
@@ -15,6 +18,7 @@ export class UpdateVerificationStatusUsecase {
     private readonly queueOutpatientRepository: QueueOutpatientRepository,
     private readonly scheduleRepository: ScheduleRepository,
     private readonly notificationProducer: NotificationProducer,
+    private readonly queueStatusProducer: QueueStatusProducer,
   ) {}
 
   async execute(
@@ -103,7 +107,7 @@ export class UpdateVerificationStatusUsecase {
       const currentDate = new Date(now.getTime() + 8 * 60 * 60 * 1000); // add utc+8 to current time
       const delayTime = date.getTime() - currentDate.getTime(); // change delayTime to range from current ms time until queue start time
       //   console.log('date represent: ', outpatientDate);
-        // console.log('start time: ', queueStartDB);
+      // console.log('start time: ', queueStartDB);
       //   console.log(`should be date: `, date);
       //   console.log(`should be seconds total: `, date.getTime());
       //   console.log(`should be right now: `, new Date().getTime());
@@ -114,9 +118,24 @@ export class UpdateVerificationStatusUsecase {
         delayTime,
       );
 
+      const delayUpdateFinishStatus =
+        delayTime + 2 * 3600 * 1000 + 10 * 60 * 1000;
+
+      // add 2 hours and 10 minute to update status event
+      const queueUpdateStatusToFinishEvent = new QueueStatusEvent(
+        queueOutpatient.id_queue,
+        QueueStatus.FINISHED,
+        delayUpdateFinishStatus,
+      );
+
       await this.notificationProducer.publishWithDelay(
         notificationEvent,
         delayTime,
+      );
+
+      await this.queueStatusProducer.publishWithDelay(
+        queueUpdateStatusToFinishEvent,
+        delayUpdateFinishStatus,
       );
 
       console.log(`Updated queue times for outpatient ID: ${outpatientIdDB}`);
@@ -143,7 +162,8 @@ export class UpdateVerificationStatusUsecase {
     const endTime = end_time.getTime();
     const slotDuration = (endTime - startTime) / slot;
 
-    const startQueueTime = startTime + (slotDuration * (queueNo - 1)) - 8 * 3600 * 1000;
+    const startQueueTime =
+      startTime + slotDuration * (queueNo - 1) - 8 * 3600 * 1000;
     const endQueueTime = startQueueTime + 10 * 60 * 1000;
 
     return {

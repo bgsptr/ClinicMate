@@ -10,6 +10,8 @@ import { Register } from "src/use-cases/users/register/register.use-case";
 import { UserRepository } from "src/infrastructure/repositories/user.repository";
 import { AuthAccountMapper } from "src/core/domain/mappers/users/auth-account.mapper";
 import { Hasher } from "src/provider/bcrypt.provider";
+import { SelfInformationPatientUsecase } from "src/use-cases/patients/self-data/fetch-self-information.use-case";
+import { GetPatientUsecase } from "src/use-cases/patients/self-data/get-patient.use-case";
 
 @Module({
     controllers: [PatientController],
@@ -51,6 +53,20 @@ import { Hasher } from "src/provider/bcrypt.provider";
                 authAccountMapper: AuthAccountMapper
             ) => new Register(userRepository, hasher, authAccountMapper),
             inject: [UserRepository, Hasher, AuthAccountMapper]
+        },
+        {
+            provide: SelfInformationPatientUsecase,
+            useFactory: (
+                patientRepository: PatientRepository,
+            ) => new SelfInformationPatientUsecase(patientRepository),
+            inject: [PatientRepository]
+        },
+        {
+            provide: GetPatientUsecase,
+            useFactory: (
+                patientRepository: PatientRepository,
+            ) => new GetPatientUsecase(patientRepository),
+            inject: [PatientRepository]
         }
     ]
 })

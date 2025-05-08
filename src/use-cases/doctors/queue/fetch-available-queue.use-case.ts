@@ -23,7 +23,7 @@ export class FetchAvailableQueueUsecase {
 
         const [year, month, day] = consultDate?.split("-").map(Number);
 
-        const date = new Date(year, month - 1, day + 1, 0, 0, 0);
+        const date = new Date(year, month - 1, day, 0, 0, 0);
 
         const dayIdx = date.getDay();
 
