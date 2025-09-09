@@ -17,7 +17,7 @@ export abstract class AmqpUsecase<T> {
       await this.channel.assertExchange(exchangeName, exchangeType, {
         durable: true,
         arguments: {
-          'x-delayed-type': 'direct',
+          'x-delayed-type': 'direct',  // make our change have behaviour like direct exchange
         },
       });
       await this.channel.assertQueue(queueName, { durable: true });
